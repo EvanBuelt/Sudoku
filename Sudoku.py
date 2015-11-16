@@ -181,6 +181,7 @@ def printBoard(board):
 
     # Print output onto screen
     print output
+    return output
     
 def solveBoard(filePath):
 
@@ -202,5 +203,7 @@ def solveBoard(filePath):
     printBoard(board)
     print "\nSolved Board\n"
     printBoard(solvedBoard)
+
+    return solvedBoard, result
 
 
