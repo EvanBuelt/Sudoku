@@ -54,9 +54,9 @@ class Board:
                 self.removePV(i, j)
 
     def removePV(self, row, column):
-        self._removePV_Row(row, column)
-        self._removePV_Column(row, column)
-        self._removePV_Box(row, column)
+        self.removePV_Row(row, column)
+        self.removePV_Column(row, column)
+        self.removePV_Box(row, column)
 
     def removePVOptimized(self, row, column):
         x = 3 * (row/3)
@@ -68,19 +68,19 @@ class Board:
             self._board[i][column].removePossibleValue(value)
             self._board[x + (i/3)][y + (i%3)].removePossibleValue(value)
         
-    def _removePV_Row(self, row, column):
+    def removePV_Row(self, row, column):
         value = self._board[row][column].value
         for j in range(0, 9):
             self._board[row][j].removePossibleValue(value)
         return
 
-    def _removePV_Column(self, row, column):
+    def removePV_Column(self, row, column):
         value = self._board[row][column].value
         for i in range(0, 9):
             self._board[i][column].removePossibleValue(value)
         return
 
-    def _removePV_Box(self, row, column):
+    def removePV_Box(self, row, column):
         x = 3 * (row/3)
         y = 3 * (column/3)
 
@@ -104,7 +104,11 @@ class ElegantSolver:
     def solve(self):
         running = True
         while running:
-            running = self.single() or self.hiddenSingle()
+            result3 = self.double()
+            result1 = self.single()
+            result2 = self.hiddenSingle()
+            running = (result1 or result2) and result3
+            #running = self.single() or self.hiddenSingle() or self.double()
             
         solvedBoard, result = SmartBruteForce(self.board)
 
@@ -181,11 +185,78 @@ class ElegantSolver:
     def double(self):
         board = self.board._board
         found = False
+        
+        doubles = []
+        # Find double in row
         for i in range(0,9):
             for j in range(0,9):
-                if len(board[i][j].possibleValues) is 1:
-                    found = True
-                    self.setValue(board[i][j].possibleValues[0], i, j)
+                # Append any cell with only 2 possible values
+                if len(board[i][j].possibleValues) is 2:
+                    doubles.append(board[i][j])
+            if len(doubles) > 1:
+                for k in range(0, len(doubles)):
+                    for l in range(k + 1, len(doubles)):
+                        if (doubles[k].possibleValues[0] == doubles[l].possibleValues[0] and
+                            doubles[k].possibleValues[1] == doubles[l].possibleValues[1]):
+                            value1 = doubles[k].possibleValues[0]
+                            value2 = doubles[k].possibleValues[1]
+                            for column in range(0, 9):
+                                board[i][column].removePossibleValue(value1)
+                                board[i][column].removePossibleValue(value2)
+                            doubles[k].addPossibleValue(value1)
+                            doubles[k].addPossibleValue(value2)
+                            doubles[l].addPossibleValue(value1)
+                            doubles[l].addPossibleValue(value2)
+                            found = True
+            doubles = []
+
+        # Find double in column
+        for j in range(0,9):
+            for i in range(0,9):
+                # Append any cell with only 2 possible values
+                if len(board[i][j].possibleValues) is 2:
+                    doubles.append(board[i][j])
+            if len(doubles) > 1:
+                for k in range(0, len(doubles)):
+                    for l in range(k + 1, len(doubles)):
+                        if (doubles[k].possibleValues[0] == doubles[l].possibleValues[0] and
+                            doubles[k].possibleValues[1] == doubles[l].possibleValues[1]):
+                            value1 = doubles[k].possibleValues[0]
+                            value2 = doubles[k].possibleValues[1]
+                            for row in range(0, 9):
+                                board[row][j].removePossibleValue(value1)
+                                board[row][j].removePossibleValue(value2)
+                            doubles[k].addPossibleValue(value1)
+                            doubles[k].addPossibleValue(value2)
+                            doubles[l].addPossibleValue(value1)
+                            doubles[l].addPossibleValue(value2)
+                            found = True
+            doubles = []
+
+        # Find double in 3x3 box
+        for i in range(0,3):
+            for j in range(0,3):
+                for k in range(0,3):
+                    for l in range(0,3):
+                        if len(board[i*3 + k][j*3 + l].possibleValues) is 2:
+                            doubles.append(board[i*3 + k][j*3 + l])
+                if len(doubles) > 1:
+                    for k in range(0, len(doubles)):
+                        for l in range(k + 1, len(doubles)):
+                            if (doubles[k].possibleValues[0] == doubles[l].possibleValues[0] and
+                                doubles[k].possibleValues[1] == doubles[l].possibleValues[1]):
+                                value1 = doubles[k].possibleValues[0]
+                                value2 = doubles[k].possibleValues[1]
+                                for row in range(0, 3):
+                                    for column in range(0,3):
+                                        board[i*3 + row][j*3 + column].removePossibleValue(value1)
+                                        board[i*3 + row][j*3 + column].removePossibleValue(value2)
+                                doubles[k].addPossibleValue(value1)
+                                doubles[k].addPossibleValue(value2)
+                                doubles[l].addPossibleValue(value1)
+                                doubles[l].addPossibleValue(value2)
+                                found = True
+                doubles = []
         return found
 
     def hiddenDouble(self):
@@ -299,20 +370,34 @@ def elegantSolverTest():
     print "\nSolved Board 6\n"
     printBoard(solvedBoard6)
 
+    print 'Board 1'
     smartSolveBoard('Sudoku Board 1.txt')
+    print 'Board 2'
     smartSolveBoard('Sudoku Board 2.txt')
+    print 'Board 3'
     smartSolveBoard('Sudoku Board 3.txt')
+    print 'Board 4'
     smartSolveBoard('Sudoku Board 4.txt')
+    print 'Board 5'
     smartSolveBoard('Sudoku Board 5.txt')
+    print 'Board 6'
     smartSolveBoard('Sudoku Board 6.txt')
 
-    # Board 1: 0.082, 0.413, 5.037 times faster
-    # Board 2: 0.001, 0.000, slower
-    # Board 3: 4.632, 4.669, 1.008 times faster
-    # Board 4: 0.002, 9.183, 4592 times faster
-    # Board 5: 0.001, 0.424, 424 times faster
-    # Board 6: 0.003, 0.019, 6.333 times faster
-    
+    # Test with single, hidden single
+    # Board 1: 0.082, 0.413
+    # Board 2: 0.001, 0.000
+    # Board 3: 4.632, 4.669
+    # Board 4: 0.002, 9.183
+    # Board 5: 0.001, 0.424
+    # Board 6: 0.003, 0.019
+
+    # Test with single, hidden single, double
+    # Board 1: 0.002, 0.409
+    # Board 2: 0.000, 0.000
+    # Board 3: 4.626, 4.637
+    # Board 4: 0.002, 9.137
+    # Board 5: 0.002, 0.419
+    # Board 6: 0.003, 0.019
 def SmartBruteForce(cBoard, board=None):
     if board is None:
         board = cBoard.board
