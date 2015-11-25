@@ -105,9 +105,10 @@ class ElegantSolver:
         running = True
         while running:
             result3 = self.double()
+            result4 = self.hiddenDouble()
             result1 = self.single()
             result2 = self.hiddenSingle()
-            running = (result1 or result2) and result3
+            running = (result1 or result2) and result3 and result4
             #running = self.single() or self.hiddenSingle() or self.double()
             
         solvedBoard, result = SmartBruteForce(self.board)
@@ -260,7 +261,119 @@ class ElegantSolver:
         return found
 
     def hiddenDouble(self):
-        return
+        numberCount = [(0, []) for value in range(0,9)]
+        doubles = []
+        board = self.board._board
+        found = False
+        
+        # Find double in row
+        for i in range(0,9):
+            for j in range(0,9):
+                for value in board[i][j].possibleValues:
+                    count, location = numberCount[value - 1]
+                    count += 1
+                    location.append((i, j))
+                    numberCount[value - 1] = (count, location)
+            for value in range(1,10):
+                if numberCount[value - 1][0] is 2:
+                    doubles.append((value,numberCount[value-1][1]))
+            if len(doubles) > 1:
+                for k in range(0, len(doubles)):
+                    for l in range(k + 1, len(doubles)):
+                        if (doubles[k][1][0] == doubles[l][1][0] and
+                            doubles[k][1][1] == doubles[l][1][1]):
+                            x1 = doubles[k][1][0][0]
+                            x2 = doubles[k][1][1][0]
+                            y1 = doubles[k][1][0][1]
+                            y2 = doubles[k][1][1][1]
+                            value1 = doubles[k][0]
+                            value2 = doubles[l][0]
+                            for value in range(0, 9):
+                                board[x1][y1].removePossibleValue(value)
+                                board[x2][y2].removePossibleValue(value)
+                            board[x1][y1].addPossibleValue(value1)
+                            board[x1][y1].addPossibleValue(value2)
+                            board[x2][y2].addPossibleValue(value1)
+                            board[x2][y2].addPossibleValue(value2)
+                            found = True
+            numberCount = [(0, []) for value in range(0,9)]
+            doubles = []
+
+        numberCount = [(0, []) for value in range(0,9)]
+        doubles = []
+        
+        # Find double in column
+        for j in range(0,9):
+            for i in range(0,9):
+                for value in board[i][j].possibleValues:
+                    count, location = numberCount[value - 1]
+                    count += 1
+                    location.append((i, j))
+                    numberCount[value - 1] = (count, location)
+            for value in range(1,10):
+                if numberCount[value - 1][0] is 2:
+                    doubles.append((value,numberCount[value-1][1]))
+            if len(doubles) > 1:
+                for k in range(0, len(doubles)):
+                    for l in range(k + 1, len(doubles)):
+                        if (doubles[k][1][0] == doubles[l][1][0] and
+                            doubles[k][1][1] == doubles[l][1][1]):
+                            x1 = doubles[k][1][0][0]
+                            x2 = doubles[k][1][1][0]
+                            y1 = doubles[k][1][0][1]
+                            y2 = doubles[k][1][1][1]
+                            value1 = doubles[k][0]
+                            value2 = doubles[l][0]
+                            for value in range(0, 9):
+                                board[x1][y1].removePossibleValue(value)
+                                board[x2][y2].removePossibleValue(value)
+                            board[x1][y1].addPossibleValue(value1)
+                            board[x1][y1].addPossibleValue(value2)
+                            board[x2][y2].addPossibleValue(value1)
+                            board[x2][y2].addPossibleValue(value2)
+                            found = True
+            numberCount = [(0, []) for value in range(0,9)]
+            doubles = []
+
+        numberCount = [(0, []) for value in range(0,9)]
+        doubles = []
+        
+        # Find double in box
+        for i in range(0,3):
+            for j in range(0,3):
+                for k in range(0,3):
+                    for l in range(0,3):
+                        for value in board[i*3 + k][j*3 +l].possibleValues:
+                            count, location = numberCount[value - 1]
+                            count += 1
+                            location.append((i*3 + k, j*3 +l))
+                            numberCount[value - 1] = (count, location)
+                for value in range(1,10):
+                    if numberCount[value - 1][0] is 2:
+                        doubles.append((value,numberCount[value-1][1]))
+                if len(doubles) > 1:
+                    for k in range(0, len(doubles)):
+                        for l in range(k + 1, len(doubles)):
+                            if (doubles[k][1][0] == doubles[l][1][0] and
+                                doubles[k][1][1] == doubles[l][1][1]):
+                                x1 = doubles[k][1][0][0]
+                                x2 = doubles[k][1][1][0]
+                                y1 = doubles[k][1][0][1]
+                                y2 = doubles[k][1][1][1]
+                                value1 = doubles[k][0]
+                                value2 = doubles[l][0]
+                                for value in range(0, 9):
+                                    board[x1][y1].removePossibleValue(value)
+                                    board[x2][y2].removePossibleValue(value)
+                                board[x1][y1].addPossibleValue(value1)
+                                board[x1][y1].addPossibleValue(value2)
+                                board[x2][y2].addPossibleValue(value1)
+                                board[x2][y2].addPossibleValue(value2)
+                                found = True
+                numberCount = [(0, []) for value in range(0,9)]
+                doubles = []
+
+        return found
     
 def elegantSolverTest():
     # Load in board, and time how long it takes to solve.
@@ -398,6 +511,15 @@ def elegantSolverTest():
     # Board 4: 0.002, 9.137
     # Board 5: 0.002, 0.419
     # Board 6: 0.003, 0.019
+
+    # Test with single, hiddlen single, double, hidden double
+    # Board 1: 0.003, 0.408
+    # Board 2: 0.001, 0.000
+    # Board 3: 3.789, 4.626
+    # Board 4: 0.003, 9.107
+    # Board 5: 0.002, 0.418
+    # Board 6: 0.005, 0.019
+    
 def SmartBruteForce(cBoard, board=None):
     if board is None:
         board = cBoard.board
@@ -657,3 +779,34 @@ def solveBoard(filePath):
     printBoard(solvedBoard)
 
     return solvedBoard, result
+
+'''
+Original Board
+
+5 2 8|4 7 3|1 9 6
+9 5 1|6    |4 7 8
+7 5 6|9 1 8|2 3 5
+-----+-----+-----
+3 7 9|2 8 4|5 6 1
+8 6 2|7 3  |9 4  
+4 1  |5 6 9|7 2 3
+-----+-----+-----
+1 9 5|3 4 6|8   7
+2 4 3|8 5 7|6 1 9
+6 8 7|1 9 2|3   5
+
+
+Solved Board
+
+5 3 9|2 7 6|4 1 8
+7 2 8|3 1 4|9 6 5
+6 4 1|8 9 5|7 3 2
+-----+-----+-----
+4 6 2|5 3 9|8 7 1
+3 8 5|7 2 1|6 4 9
+1 9 7|4 6 8|2 5 3
+-----+-----+-----
+2 5 6|1 8 7|3 9 4
+9 1 3|6 4 2|5 8 7
+8 7 4|9 5 3|1 2 6
+'''
