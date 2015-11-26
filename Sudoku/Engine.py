@@ -35,7 +35,7 @@ class Cell:
         return
 
     def addPV(self, value):
-        if value in range(1,10) and value not in self.possibleValues:
+        if value not in self.possibleValues:
             self.possibleValues.append(value)
         return
 
@@ -56,7 +56,7 @@ class Board:
     def setValue(self, value, row, column):
         self.board[row][column] = value
         self._board[row][column].setValue(value)
-        self.removePVOptimized(row, column)
+        self.removePV(row, column)
         
     def removePV(self, row, column):
         self.removePV_Row(row, column)
@@ -107,13 +107,25 @@ class ElegantSolver:
     def solve(self):
         running = True
         while running:
+            #IO.printBoard(self.board.board)
             result3 = self.double()
             result4 = self.hiddenDouble()
             result1 = self.single()
             result2 = self.hiddenSingle()
-            running = (result1 or result2) and result3 and result4
-            #running = (result 1 or result2) and result3
-            
+            #IO.printBoard(self.board.board)
+            #for i in range(0,9):
+            #    print i
+            #    for j in range(0,9):
+            #        print self.board._board[i][j].possibleValues
+            #    print ''
+            running = result1 or result2
+            #print result1, result2, result3, result4
+
+        #for i in range(0,9):
+        #    print i
+        #    for j in range(0,9):
+        #        print self.board._board[i][j].possibleValues
+        #    print ''
         solvedBoard, result = SmartBruteForce(self.board)
 
         return solvedBoard, result
@@ -127,13 +139,44 @@ class ElegantSolver:
                     found = True
                     self.setValue(board[i][j].possibleValues[0], i, j)
 
+        #print 'S', found
         return found
     
     def hiddenSingle(self):
+        found1 = self.hiddenSingleRow()
+        found2 = self.hiddenSingleColumn()
+        found3 = self.hiddenSingleBox()
+        #found = (self.hiddenSingleRow() or
+        #         self.hiddenSingleColumn() or
+        #         self.hiddenSingleBox())
+        found = found1 or found2 or found3
+        return found
+
+    def double(self):
+        found1 = self.doubleRow()
+        found2 = self.doubleColumn()
+        found3 = self.doubleBox()
+        #found = (self.doubleRow() or
+        #         self.doubleColumn() or
+        #         self.doubleBox())
+        found = found1 or found2 or found3
+        return found
+
+    def hiddenDouble(self):
+        found1 = self.hiddenDoubleRow()
+        found2 = self.hiddenDoubleColumn()
+        found3 = self.hiddenDoubleBox()
+        #found = (self.hiddenDoubleRow() or
+        #         self.hiddenDoubleColumn() or
+        #         self.hiddenDoubleBox())
+        found = found1 or found2 or found3
+        return found
+
+    def hiddenSingleRow(self):
         numberCount = [(0, []) for value in range(0,9)]
         board = self.board._board
         found = False
-        
+
         # Find single in row
         for i in range(0,9):
             for j in range(0,9):
@@ -148,9 +191,13 @@ class ElegantSolver:
                     self.setValue(value, x, y)
                     found = True
             numberCount = [(0, []) for value in range(0,9)]
+        return found
 
+    def hiddenSingleColumn(self):
         numberCount = [(0, []) for value in range(0,9)]
-        
+        board = self.board._board
+        found = False
+
         # Find single in column
         for j in range(0,9):
             for i in range(0,9):
@@ -165,9 +212,13 @@ class ElegantSolver:
                     self.setValue(value, x, y)
                     found = True
             numberCount = [(0, []) for value in range(0,9)]
+        return found
 
+    def hiddenSingleBox(self):
         numberCount = [(0, []) for value in range(0,9)]
-        
+        board = self.board._board
+        found = False
+
         # Find single in box
         for i in range(0,3):
             for j in range(0,3):
@@ -183,14 +234,14 @@ class ElegantSolver:
                         (x, y) = numberCount[value - 1][1][0]
                         self.setValue(value, x, y)
                         found = True
-                numberCount = [(0, []) for value in range(0,9)]   
+                numberCount = [(0, []) for value in range(0,9)]
         return found
 
-    def double(self):
+    def doubleRow(self):
         board = self.board._board
+        doubles = []
         found = False
         
-        doubles = []
         # Find double in row
         for i in range(0,9):
             for j in range(0,9):
@@ -213,6 +264,12 @@ class ElegantSolver:
                             doubles[l].addPV(value2)
                             found = True
             doubles = []
+        return found
+
+    def doubleColumn(self):
+        board = self.board._board
+        doubles = []
+        found = False
 
         # Find double in column
         for j in range(0,9):
@@ -236,6 +293,12 @@ class ElegantSolver:
                             doubles[l].addPV(value2)
                             found = True
             doubles = []
+        return found
+
+    def doubleBox(self):
+        board = self.board._board
+        doubles = []
+        found = False
 
         # Find double in 3x3 box
         for i in range(0,3):
@@ -263,12 +326,12 @@ class ElegantSolver:
                 doubles = []
         return found
 
-    def hiddenDouble(self):
+    def hiddenDoubleRow(self):
         numberCount = [(0, []) for value in range(0,9)]
         doubles = []
         board = self.board._board
         found = False
-        
+
         # Find double in row
         for i in range(0,9):
             for j in range(0,9):
@@ -301,10 +364,14 @@ class ElegantSolver:
                             found = True
             numberCount = [(0, []) for value in range(0,9)]
             doubles = []
+        return found
 
+    def hiddenDoubleColumn(self):
         numberCount = [(0, []) for value in range(0,9)]
         doubles = []
-        
+        board = self.board._board
+        found = False
+
         # Find double in column
         for j in range(0,9):
             for i in range(0,9):
@@ -337,10 +404,14 @@ class ElegantSolver:
                             found = True
             numberCount = [(0, []) for value in range(0,9)]
             doubles = []
+        return found
 
+    def hiddenDoubleBox(self):
         numberCount = [(0, []) for value in range(0,9)]
         doubles = []
-        
+        board = self.board._board
+        found = False
+
         # Find double in box
         for i in range(0,3):
             for j in range(0,3):
@@ -375,9 +446,8 @@ class ElegantSolver:
                                 found = True
                 numberCount = [(0, []) for value in range(0,9)]
                 doubles = []
-
         return found
-
+    
 def SmartBruteForce(cBoard, board=None):
     if board is None:
         board = cBoard.board

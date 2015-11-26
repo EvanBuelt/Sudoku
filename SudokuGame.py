@@ -130,6 +130,7 @@ def elegantSolverTest():
     # Board 4: 0.002, 9.183
     # Board 5: 0.001, 0.424
     # Board 6: 0.003, 0.019
+    # Total: 4.72, 14.708
 
     # Test with single, hidden single, double
     # Board 1: 0.002, 0.409
@@ -138,7 +139,8 @@ def elegantSolverTest():
     # Board 4: 0.002, 9.137
     # Board 5: 0.002, 0.419
     # Board 6: 0.003, 0.019
-
+    # Total: 4.635
+    
     # Test with single, hiddlen single, double, hidden double
     # Board 1: 0.003, 0.408
     # Board 2: 0.001, 0.000
@@ -146,6 +148,7 @@ def elegantSolverTest():
     # Board 4: 0.003, 9.107
     # Board 5: 0.002, 0.418
     # Board 6: 0.005, 0.019
+    # Total: 3.803
 
 
 def smartSolveBoard(filePath):
