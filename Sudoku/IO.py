@@ -1,28 +1,28 @@
-def loadBoard(filePath):
-
+def load_board(file_path):
     # Load 9x9 Sudoku Board
-    SudokuFile = open(filePath, 'r')
+    sudoku_file = open(file_path, 'r')
 
     board = []
-    rawData = SudokuFile.read()
-    data = rawData.splitlines()
+    raw_data = sudoku_file.read()
+    data = raw_data.splitlines()
 
     # Add each row from the file to the board
     for row in data:
         board.append(row.split(' '))
 
     # Convert each item from a string to an integer
-    for i in range(0,9):
-        for j in range(0,9):
+    for i in range(0, 9):
+        for j in range(0, 9):
             board[i][j] = int(board[i][j])
 
     # return 9x9 board
     return board
 
-def printBoard(board):
+
+def print_board(board):
     output = ""
-    for i in range(0,9):
-        for j in range(0,9):
+    for i in range(0, 9):
+        for j in range(0, 9):
 
             # If value is 0, then add a blank.
             if board[i][j] is 0:
@@ -43,7 +43,7 @@ def printBoard(board):
             # Add a blank between numbers on screen
             else:
                 output += " "
-                
+
         # Add a barrier for every 3rd row
         if (i + 1) % 3 is 0 and i is not 8:
             output += "-----+-----+-----\n"

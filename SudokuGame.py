@@ -2,8 +2,9 @@ import Sudoku.Engine as Engine
 import Sudoku.IO as IO
 import datetime
 
-def elegantSolverTest():
-    # Load in board, and time how long it takes to solve.
+
+def elegant_solver_test():
+    # Load in all boards
     solver1 = Engine.ElegantSolver('Sudoku/Board 1.txt')
     solver2 = Engine.ElegantSolver('Sudoku/Board 2.txt')
     solver3 = Engine.ElegantSolver('Sudoku/Board 3.txt')
@@ -12,116 +13,119 @@ def elegantSolverTest():
     solver6 = Engine.ElegantSolver('Sudoku/Board 6.txt')
 
     print "\nOriginal Board 1\n"
-    IO.printBoard(solver1.board.board)
+    IO.print_board(solver1.board.raw_board)
+
     print "\nOriginal Board 2\n"
-    IO.printBoard(solver2.board.board)
+    IO.print_board(solver2.board.raw_board)
+
     print "\nOriginal Board 3\n"
-    IO.printBoard(solver3.board.board)
+    IO.print_board(solver3.board.raw_board)
+
     print "\nOriginal Board 4\n"
-    IO.printBoard(solver4.board.board)
+    IO.print_board(solver4.board.raw_board)
+
     print "\nOriginal Board 5\n"
-    IO.printBoard(solver5.board.board)
+    IO.print_board(solver5.board.raw_board)
+
     print "\nOriginal Board 6\n"
-    IO.printBoard(solver6.board.board)
-    
-    startTime = datetime.datetime.now()
-    
-    startTime1 = datetime.datetime.now()
-    solvedBoard1, result = solver1.solve()
-    endTime1 = datetime.datetime.now()
+    IO.print_board(solver6.board.raw_board)
 
-    startTime2 = datetime.datetime.now()
-    solvedBoard2, result = solver2.solve()
-    endTime2 = datetime.datetime.now()
+    # Get time for all boards
+    start_time = datetime.datetime.now()
 
-    startTime3 = datetime.datetime.now()
-    solvedBoard3, result = solver3.solve()
-    endTime3 = datetime.datetime.now()
+    # Get time for first board
+    start_time_1 = datetime.datetime.now()
+    solved_board_1, result = solver1.solve()
+    end_time_1 = datetime.datetime.now()
 
-    startTime4 = datetime.datetime.now()
-    solvedBoard4, result = solver4.solve()
-    endTime4 = datetime.datetime.now()
+    # Get time for second board
+    start_time_2 = datetime.datetime.now()
+    solved_board_2, result = solver2.solve()
+    end_time_2 = datetime.datetime.now()
 
-    startTime5 = datetime.datetime.now()
-    solvedBoard5, result = solver5.solve()
-    endTime5 = datetime.datetime.now()
-    
-    startTime6 = datetime.datetime.now()
-    solvedBoard6, result = solver6.solve()
-    endTime6 = datetime.datetime.now()
-    
-    endTime = datetime.datetime.now()
+    # Get time for third board
+    start_time_3 = datetime.datetime.now()
+    solved_board_3, result = solver3.solve()
+    end_time_3 = datetime.datetime.now()
 
-    # Calculate the difference between the start and end time
-    diffTime = endTime - startTime
-    diffTime1 = endTime1 - startTime1
-    diffTime2 = endTime2 - startTime2
-    diffTime3 = endTime3 - startTime3
-    diffTime4 = endTime4 - startTime4
-    diffTime5 = endTime5 - startTime5
-    diffTime6 = endTime6 - startTime6
-    
+    # Get time for fourth board
+    start_time_4 = datetime.datetime.now()
+    solved_board_4, result = solver4.solve()
+    end_time_4 = datetime.datetime.now()
+
+    # Get time for fifth board
+    start_time_5 = datetime.datetime.now()
+    solved_board_5, result = solver5.solve()
+    end_time_5 = datetime.datetime.now()
+
+    # Get time for sixth board
+    start_time_6 = datetime.datetime.now()
+    solved_board_6, result = solver6.solve()
+    end_time_6 = datetime.datetime.now()
+
+    # Get time for all boards
+    end_time = datetime.datetime.now()
+
+    # Calculate the difference between the start and end time for all boards
+    diff_time = end_time - start_time
+    diff_time_1 = end_time_1 - start_time_1
+    diff_time_2 = end_time_2 - start_time_2
+    diff_time_3 = end_time_3 - start_time_3
+    diff_time_4 = end_time_4 - start_time_4
+    diff_time_5 = end_time_5 - start_time_5
+    diff_time_6 = end_time_6 - start_time_6
+
     # Get the time in seconds
-    time = float(diffTime.seconds) + float(diffTime.microseconds)/float(1000000)
-    time1 = float(diffTime1.seconds) + float(diffTime1.microseconds)/float(1000000)
-    time2 = float(diffTime2.seconds) + float(diffTime2.microseconds)/float(1000000)
-    time3 = float(diffTime3.seconds) + float(diffTime3.microseconds)/float(1000000)
-    time4 = float(diffTime4.seconds) + float(diffTime4.microseconds)/float(1000000)
-    time5 = float(diffTime5.seconds) + float(diffTime5.microseconds)/float(1000000)
-    time6 = float(diffTime6.seconds) + float(diffTime6.microseconds)/float(1000000)
-    
+    time = float(diff_time.seconds) + float(diff_time.microseconds) / float(1000000)
+    time1 = float(diff_time_1.seconds) + float(diff_time_1.microseconds) / float(1000000)
+    time2 = float(diff_time_2.seconds) + float(diff_time_2.microseconds) / float(1000000)
+    time3 = float(diff_time_3.seconds) + float(diff_time_3.microseconds) / float(1000000)
+    time4 = float(diff_time_4.seconds) + float(diff_time_4.microseconds) / float(1000000)
+    time5 = float(diff_time_5.seconds) + float(diff_time_5.microseconds) / float(1000000)
+    time6 = float(diff_time_6.seconds) + float(diff_time_6.microseconds) / float(1000000)
+
     # Display information to the user.
     print time
     print ''
-    
+
     print time1
-    print "\nOriginal Board 1\n"
-    IO.printBoard(solver1.board.board)
     print "\nSolved Board 1\n"
-    IO.printBoard(solvedBoard1)
+    IO.print_board(solved_board_1)
 
     print time2
-    print "\nOriginal Board 2\n"
-    IO.printBoard(solver2.board.board)
     print "\nSolved Board 2\n"
-    IO.printBoard(solvedBoard2)
+    IO.print_board(solved_board_2)
 
     print time3
-    print "\nOriginal Board 3\n"
-    IO.printBoard(solver3.board.board)
     print "\nSolved Board 3\n"
-    IO.printBoard(solvedBoard3)
+    IO.print_board(solved_board_3)
 
     print time4
-    print "\nOriginal Board 4\n"
-    IO.printBoard(solver4.board.board)
     print "\nSolved Board 4\n"
-    IO.printBoard(solvedBoard4)
+    IO.print_board(solved_board_4)
 
     print time5
-    print "\nOriginal Board 5\n"
-    IO.printBoard(solver5.board.board)
     print "\nSolved Board 5\n"
-    IO.printBoard(solvedBoard5)
+    IO.print_board(solved_board_5)
 
     print time6
-    print "\nOriginal Board 6\n"
-    IO.printBoard(solver6.board.board)
     print "\nSolved Board 6\n"
-    IO.printBoard(solvedBoard6)
+    IO.print_board(solved_board_6)
 
+    # Print information using Brute Force, to compare to the elegant solution
+    print 'Brute Force Method\n'
     print 'Board 1'
-    smartSolveBoard('Sudoku/Board 1.txt')
+    smart_solve_board('Sudoku/Board 1.txt')
     print 'Board 2'
-    smartSolveBoard('Sudoku/Board 2.txt')
+    smart_solve_board('Sudoku/Board 2.txt')
     print 'Board 3'
-    smartSolveBoard('Sudoku/Board 3.txt')
+    smart_solve_board('Sudoku/Board 3.txt')
     print 'Board 4'
-    smartSolveBoard('Sudoku/Board 4.txt')
+    smart_solve_board('Sudoku/Board 4.txt')
     print 'Board 5'
-    smartSolveBoard('Sudoku/Board 5.txt')
+    smart_solve_board('Sudoku/Board 5.txt')
     print 'Board 6'
-    smartSolveBoard('Sudoku/Board 6.txt')
+    smart_solve_board('Sudoku/Board 6.txt')
 
     # Test with single, hidden single
     # Board 1: 0.082, 0.413
@@ -140,7 +144,7 @@ def elegantSolverTest():
     # Board 5: 0.002, 0.419
     # Board 6: 0.003, 0.019
     # Total: 4.635
-    
+
     # Test with single, hiddlen single, double, hidden double
     # Board 1: 0.003, 0.408
     # Board 2: 0.001, 0.000
@@ -151,52 +155,50 @@ def elegantSolverTest():
     # Total: 3.803
 
 
-def smartSolveBoard(filePath):
-    
+def smart_solve_board(file_path):
     # Load in board, and time how long it takes to solve.
-    board = Engine.Board(filePath)
-    startTime = datetime.datetime.now()
-    solvedBoard, result = Engine.SmartBruteForce(board)
-    endTime = datetime.datetime.now()
+    board = Engine.Board(file_path)
+    start_time = datetime.datetime.now()
+    solved_board, result = Engine.smart_brute_force(board)
+    end_time = datetime.datetime.now()
 
     # Calculate the difference between the start and end time
-    diffTime = endTime - startTime
+    diff_time = end_time - start_time
 
     # Get the time in seconds
-    time = float(diffTime.seconds) + float(diffTime.microseconds)/float(1000000)
+    time = float(diff_time.seconds) + float(diff_time.microseconds) / float(1000000)
 
     # Display information to the user.
     print time
     print "\nOriginal Board\n"
-    IO.printBoard(board.board)
+    IO.print_board(board.raw_board)
     print "\nSolved Board\n"
-    IO.printBoard(solvedBoard)
+    IO.print_board(solved_board)
 
-    return solvedBoard, result
+    return solved_board, result
 
 
-def solveBoard(filePath):
-
+def solve_board(file_path):
     # Load in board, and time how long it takes to solve.
-    board = IO.loadBoard(filePath)
-    startTime = datetime.datetime.now()
-    solvedBoard, result = EnginebruteForce(board)
-    endTime = datetime.datetime.now()
+    board = IO.load_board(file_path)
+    start_time = datetime.datetime.now()
+    solved_board, result = Engine.brute_force(board)
+    end_time = datetime.datetime.now()
 
     # Calculate the difference between the start and end time
-    diffTime = endTime - startTime
+    diff_time = end_time - start_time
 
     # Get the time in seconds
-    time = float(diffTime.seconds) + float(diffTime.microseconds)/float(1000000)
+    time = float(diff_time.seconds) + float(diff_time.microseconds) / float(1000000)
 
     # Display information to the user.
     print time
     print "\nOriginal Board\n"
-    IO.printBoard(board)
+    IO.print_board(board)
     print "\nSolved Board\n"
-    IO.printBoard(solvedBoard)
+    IO.print_board(solved_board)
 
-    return solvedBoard, result
+    return solved_board, result
 
 
 '''
