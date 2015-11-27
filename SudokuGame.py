@@ -33,31 +33,37 @@ def elegant_solver_test():
     # Get time for all boards
     start_time = datetime.datetime.now()
 
+    print "\nBoard 1\n"
     # Get time for first board
     start_time_1 = datetime.datetime.now()
     solved_board_1, result = solver1.solve()
     end_time_1 = datetime.datetime.now()
 
+    print "\nBoard 2\n"
     # Get time for second board
     start_time_2 = datetime.datetime.now()
     solved_board_2, result = solver2.solve()
     end_time_2 = datetime.datetime.now()
 
+    print "\nBoard 3\n"
     # Get time for third board
     start_time_3 = datetime.datetime.now()
     solved_board_3, result = solver3.solve()
     end_time_3 = datetime.datetime.now()
 
+    print "\nBoard 4\n"
     # Get time for fourth board
     start_time_4 = datetime.datetime.now()
     solved_board_4, result = solver4.solve()
     end_time_4 = datetime.datetime.now()
 
+    print "\nBoard 5\n"
     # Get time for fifth board
     start_time_5 = datetime.datetime.now()
     solved_board_5, result = solver5.solve()
     end_time_5 = datetime.datetime.now()
 
+    print "\nBoard 6\n"
     # Get time for sixth board
     start_time_6 = datetime.datetime.now()
     solved_board_6, result = solver6.solve()
@@ -200,6 +206,8 @@ def solve_board(file_path):
 
     return solved_board, result
 
+
+elegant_solver_test()
 
 '''
 Board 1

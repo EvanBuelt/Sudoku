@@ -34,11 +34,13 @@ class Cell:
     def remove_possible_value(self, value):
         if value in self.possibleValues:
             self.possibleValues.remove(value)
-        return
+            return True
+        return False
 
     def add_possible_value(self, value):
         if value not in self.possibleValues:
             self.possibleValues.append(value)
+            self.possibleValues.sort()
         return
 
 
@@ -115,7 +117,8 @@ class ElegantSolver:
             result4 = self.hidden_double()
             result1 = self.single()
             result2 = self.hidden_single()
-            running = result1 or result2
+            # print result1, result2, result3, result4
+            running = result1 or result2 or result4
 
         solved_board, result = smart_brute_force(self.board)
         return solved_board, result
@@ -220,7 +223,7 @@ class ElegantSolver:
     def double_row(self):
         board = self.board.cell_board
         doubles = []
-        found = False
+        removed = False
 
         # Find double in row
         for i in range(0, 9):
@@ -230,26 +233,33 @@ class ElegantSolver:
                     doubles.append(board[i][j])
             if len(doubles) > 1:
                 for k in range(0, len(doubles)):
+                    if len(doubles[k].possibleValues) < 2:
+                        break
+                    pv_k1 = doubles[k].possibleValues[0]
+                    pv_k2 = doubles[k].possibleValues[1]
                     for l in range(k + 1, len(doubles)):
-                        if (doubles[k].possibleValues[0] == doubles[l].possibleValues[0] and
-                                    doubles[k].possibleValues[1] == doubles[l].possibleValues[1]):
-                            value1 = doubles[k].possibleValues[0]
-                            value2 = doubles[k].possibleValues[1]
+                        if len(doubles[l].possibleValues) < 2:
+                            break
+                        pv_l1 = doubles[l].possibleValues[0]
+                        pv_l2 = doubles[l].possibleValues[1]
+                        if (pv_k1 == pv_l1) and (pv_k2 == pv_l2):
+                            value1 = pv_k1
+                            value2 = pv_k2
                             for column in range(0, 9):
-                                board[i][column].remove_possible_value(value1)
-                                board[i][column].remove_possible_value(value2)
+                                result1 = board[i][column].remove_possible_value(value1)
+                                result2 = board[i][column].remove_possible_value(value2)
+                                removed = removed or result1 or result2
                             doubles[k].add_possible_value(value1)
                             doubles[k].add_possible_value(value2)
                             doubles[l].add_possible_value(value1)
                             doubles[l].add_possible_value(value2)
-                            found = True
             doubles = []
-        return found
+        return removed
 
     def double_column(self):
         board = self.board.cell_board
         doubles = []
-        found = False
+        removed = False
 
         # Find double in column
         for j in range(0, 9):
@@ -259,26 +269,33 @@ class ElegantSolver:
                     doubles.append(board[i][j])
             if len(doubles) > 1:
                 for k in range(0, len(doubles)):
+                    if len(doubles[k].possibleValues) < 2:
+                        break
+                    pv_k1 = doubles[k].possibleValues[0]
+                    pv_k2 = doubles[k].possibleValues[1]
                     for l in range(k + 1, len(doubles)):
-                        if (doubles[k].possibleValues[0] == doubles[l].possibleValues[0] and
-                                    doubles[k].possibleValues[1] == doubles[l].possibleValues[1]):
-                            value1 = doubles[k].possibleValues[0]
-                            value2 = doubles[k].possibleValues[1]
+                        if len(doubles[l].possibleValues) < 2:
+                            break
+                        pv_l1 = doubles[l].possibleValues[0]
+                        pv_l2 = doubles[l].possibleValues[1]
+                        if (pv_k1 == pv_l1) and (pv_k2 == pv_l2):
+                            value1 = pv_k1
+                            value2 = pv_k2
                             for row in range(0, 9):
-                                board[row][j].remove_possible_value(value1)
-                                board[row][j].remove_possible_value(value2)
+                                result1 = board[row][j].remove_possible_value(value1)
+                                result2 = board[row][j].remove_possible_value(value2)
+                                removed = removed or result1 or result2
                             doubles[k].add_possible_value(value1)
                             doubles[k].add_possible_value(value2)
                             doubles[l].add_possible_value(value1)
                             doubles[l].add_possible_value(value2)
-                            found = True
             doubles = []
-        return found
+        return removed
 
     def double_box(self):
         board = self.board.cell_board
         doubles = []
-        found = False
+        removed = False
 
         # Find double in 3x3 box
         for i in range(0, 3):
@@ -289,68 +306,83 @@ class ElegantSolver:
                             doubles.append(board[i * 3 + k][j * 3 + l])
                 if len(doubles) > 1:
                     for k in range(0, len(doubles)):
+                        if len(doubles[k].possibleValues) < 2:
+                            break
+                        pv_k1 = doubles[k].possibleValues[0]
+                        pv_k2 = doubles[k].possibleValues[1]
                         for l in range(k + 1, len(doubles)):
-                            if (doubles[k].possibleValues[0] == doubles[l].possibleValues[0] and
-                                        doubles[k].possibleValues[1] == doubles[l].possibleValues[1]):
-                                value1 = doubles[k].possibleValues[0]
-                                value2 = doubles[k].possibleValues[1]
+                            if len(doubles[l].possibleValues) < 2:
+                                break
+                            pv_l1 = doubles[l].possibleValues[0]
+                            pv_l2 = doubles[l].possibleValues[1]
+                            if (pv_k1 == pv_l1) and (pv_k2 == pv_l2):
+                                value1 = pv_k1
+                                value2 = pv_k2
                                 for row in range(0, 3):
                                     for column in range(0, 3):
-                                        board[i * 3 + row][j * 3 + column].remove_possible_value(value1)
-                                        board[i * 3 + row][j * 3 + column].remove_possible_value(value2)
+                                        result1 = board[i * 3 + row][j * 3 + column].remove_possible_value(value1)
+                                        result2 = board[i * 3 + row][j * 3 + column].remove_possible_value(value2)
+                                        removed = removed or result1 or result2
                                 doubles[k].add_possible_value(value1)
                                 doubles[k].add_possible_value(value2)
                                 doubles[l].add_possible_value(value1)
                                 doubles[l].add_possible_value(value2)
-                                found = True
                 doubles = []
-        return found
+        return removed
 
     def hidden_double_row(self):
         number_count = [(0, []) for value in range(0, 9)]
         doubles = []
         board = self.board.cell_board
-        found = False
+        removed = False
 
         # Find double in row
         for i in range(0, 9):
             for j in range(0, 9):
                 for value in board[i][j].possibleValues:
-                    count, location = number_count[value - 1]
+                    count, location_list = number_count[value - 1]
                     count += 1
-                    location.append((i, j))
-                    number_count[value - 1] = (count, location)
+                    location_list.append((i, j))
+                    number_count[value - 1] = (count, location_list)
             for value in range(1, 10):
-                if number_count[value - 1][0] is 2:
-                    doubles.append((value, number_count[value - 1][1]))
+                count, location_list = number_count[value - 1]
+                if count is 2:
+                    doubles.append((value, location_list))
             if len(doubles) > 1:
                 for k in range(0, len(doubles)):
+                    value1, location_list_k = doubles[k]
+                    location_k1 = location_list_k[0]
+                    location_k2 = location_list_k[1]
                     for l in range(k + 1, len(doubles)):
-                        if (doubles[k][1][0] == doubles[l][1][0] and
-                                    doubles[k][1][1] == doubles[l][1][1]):
-                            x1 = doubles[k][1][0][0]
-                            x2 = doubles[k][1][1][0]
-                            y1 = doubles[k][1][0][1]
-                            y2 = doubles[k][1][1][1]
-                            value1 = doubles[k][0]
-                            value2 = doubles[l][0]
-                            for value in range(0, 9):
-                                board[x1][y1].remove_possible_value(value)
-                                board[x2][y2].remove_possible_value(value)
-                            board[x1][y1].add_possible_value(value1)
-                            board[x1][y1].add_possible_value(value2)
-                            board[x2][y2].add_possible_value(value1)
-                            board[x2][y2].add_possible_value(value2)
-                            found = True
+                        value2, location_list_l = doubles[l]
+                        location_l1 = location_list_l[0]
+                        location_l2 = location_list_l[1]
+                        if (location_k1 == location_l1) and (location_k2 == location_l2):
+                            x1 = location_k1[0]
+                            x2 = location_k1[0]
+                            y1 = location_k1[1]
+                            y2 = location_k1[1]
+                            for value in range(1, value1):
+                                result1 = board[x1][y1].remove_possible_value(value)
+                                result2 = board[x2][y2].remove_possible_value(value)
+                                removed = removed or result1 or result2
+                            for value in range(value1 + 1, value2):
+                                result1 = board[x1][y1].remove_possible_value(value)
+                                result2 = board[x2][y2].remove_possible_value(value)
+                                removed = removed or result1 or result2
+                            for value in range(value2 + 1,10):
+                                result1 = board[x1][y1].remove_possible_value(value)
+                                result2 = board[x2][y2].remove_possible_value(value)
+                                removed = removed or result1 or result2
             number_count = [(0, []) for value in range(0, 9)]
             doubles = []
-        return found
+        return removed
 
     def hidden_double_column(self):
         number_count = [(0, []) for value in range(0, 9)]
         doubles = []
         board = self.board.cell_board
-        found = False
+        removed = False
 
         # Find double in column
         for j in range(0, 9):
@@ -365,32 +397,39 @@ class ElegantSolver:
                     doubles.append((value, number_count[value - 1][1]))
             if len(doubles) > 1:
                 for k in range(0, len(doubles)):
+                    value1, location_list_k = doubles[k]
+                    location_k1 = location_list_k[0]
+                    location_k2 = location_list_k[1]
                     for l in range(k + 1, len(doubles)):
-                        if (doubles[k][1][0] == doubles[l][1][0] and
-                                    doubles[k][1][1] == doubles[l][1][1]):
-                            x1 = doubles[k][1][0][0]
-                            x2 = doubles[k][1][1][0]
-                            y1 = doubles[k][1][0][1]
-                            y2 = doubles[k][1][1][1]
-                            value1 = doubles[k][0]
-                            value2 = doubles[l][0]
-                            for value in range(0, 9):
-                                board[x1][y1].remove_possible_value(value)
-                                board[x2][y2].remove_possible_value(value)
-                            board[x1][y1].add_possible_value(value1)
-                            board[x1][y1].add_possible_value(value2)
-                            board[x2][y2].add_possible_value(value1)
-                            board[x2][y2].add_possible_value(value2)
-                            found = True
+                        value2, location_list_l = doubles[l]
+                        location_l1 = location_list_l[0]
+                        location_l2 = location_list_l[1]
+                        if (location_k1 == location_l1) and (location_k2 == location_l2):
+                            x1 = location_k1[0]
+                            x2 = location_k1[0]
+                            y1 = location_k1[1]
+                            y2 = location_k1[1]
+                            for value in range(1, value1):
+                                result1 = board[x1][y1].remove_possible_value(value)
+                                result2 = board[x2][y2].remove_possible_value(value)
+                                removed = removed or result1 or result2
+                            for value in range(value1 + 1, value2):
+                                result1 = board[x1][y1].remove_possible_value(value)
+                                result2 = board[x2][y2].remove_possible_value(value)
+                                removed = removed or result1 or result2
+                            for value in range(value2 + 1,10):
+                                result1 = board[x1][y1].remove_possible_value(value)
+                                result2 = board[x2][y2].remove_possible_value(value)
+                                removed = removed or result1 or result2
             number_count = [(0, []) for value in range(0, 9)]
             doubles = []
-        return found
+        return removed
 
     def hidden_double_box(self):
         number_count = [(0, []) for value in range(0, 9)]
         doubles = []
         board = self.board.cell_board
-        found = False
+        removed = False
 
         # Find double in box
         for i in range(0, 3):
@@ -407,31 +446,38 @@ class ElegantSolver:
                         doubles.append((value, number_count[value - 1][1]))
                 if len(doubles) > 1:
                     for k in range(0, len(doubles)):
+                        value1, location_list_k = doubles[k]
+                        location_k1 = location_list_k[0]
+                        location_k2 = location_list_k[1]
                         for l in range(k + 1, len(doubles)):
-                            if (doubles[k][1][0] == doubles[l][1][0] and
-                                        doubles[k][1][1] == doubles[l][1][1]):
-                                x1 = doubles[k][1][0][0]
-                                x2 = doubles[k][1][1][0]
-                                y1 = doubles[k][1][0][1]
-                                y2 = doubles[k][1][1][1]
-                                value1 = doubles[k][0]
-                                value2 = doubles[l][0]
-                                for value in range(0, 9):
-                                    board[x1][y1].remove_possible_value(value)
-                                    board[x2][y2].remove_possible_value(value)
-                                board[x1][y1].add_possible_value(value1)
-                                board[x1][y1].add_possible_value(value2)
-                                board[x2][y2].add_possible_value(value1)
-                                board[x2][y2].add_possible_value(value2)
-                                found = True
+                            value2, location_list_l = doubles[l]
+                            location_l1 = location_list_l[0]
+                            location_l2 = location_list_l[1]
+                            if (location_k1 == location_l1) and (location_k2 == location_l2):
+                                x1 = location_k1[0]
+                                x2 = location_k1[0]
+                                y1 = location_k1[1]
+                                y2 = location_k1[1]
+                                for value in range(1, value1):
+                                    result1 = board[x1][y1].remove_possible_value(value)
+                                    result2 = board[x2][y2].remove_possible_value(value)
+                                    removed = removed or result1 or result2
+                                for value in range(value1 + 1, value2):
+                                    result1 = board[x1][y1].remove_possible_value(value)
+                                    result2 = board[x2][y2].remove_possible_value(value)
+                                    removed = removed or result1 or result2
+                                for value in range(value2 + 1,10):
+                                    result1 = board[x1][y1].remove_possible_value(value)
+                                    result2 = board[x2][y2].remove_possible_value(value)
+                                    removed = removed or result1 or result2
                 number_count = [(0, []) for value in range(0, 9)]
                 doubles = []
-        return found
+        return removed
 
 
 def smart_brute_force(cell_board, raw_board=None):
     if raw_board is None:
-        raw_board = cell_board.board
+        raw_board = cell_board.raw_board
 
     # Return true if solved.  This will bring the correct board up through the chain of calls.
     if Solve.is_solved_board(raw_board):
