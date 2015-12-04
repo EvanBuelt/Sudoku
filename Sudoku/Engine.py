@@ -2,16 +2,17 @@ import IO
 import Solve
 
 
-# Singles in box
-# Hidden Singles in row/column/box
-# Values locked to row/column in box
-# Pairs in row/column/box
-# Triples in row/column/box
-# Quads in row/column/box
-# Hidden Pairs in row/column/box
-# Hidden Triples/Quads in row/column/box (rare)
-# X-Wing
-# Swordfish
+# 1 Singles in box
+# 1 Hidden Singles in row/column/box
+# 0 Values locked to row/column in box
+# 1 Pairs in row/column/box
+# 0 Triples in row/column/box
+# 0 Quads in row/column/box
+# 1 Hidden Pairs in row/column/box
+# 0 Hidden Triples in row/column/box (rare)
+# 0 Hidden Quads in a row/column/box (rare)
+# 0 X-Wing
+# 0 Swordfish
 
 class Cell:
     def __init__(self, value=None):
@@ -113,14 +114,26 @@ class ElegantSolver:
     def solve(self):
         running = True
         while running:
+            # Run techniques to remove any possible values from cells
             result3 = self.double()
             result4 = self.hidden_double()
+            result5 = self.triple()
+            result6 = self.hidden_triple()
+            result7 = self.quad()
+            result8 = self.hidden_quad()
+            result9 = self.x_wing()
+            result0 = self.swordfish()
+
+            # Set values in cells that have only one possible value
             result1 = self.single()
             result2 = self.hidden_single()
+
             # print result1, result2, result3, result4
             running = result1 or result2 or result4
 
+        IO.print_board(self.board.raw_board)
         solved_board, result = smart_brute_force(self.board)
+        IO.print_board(solved_board)
         return solved_board, result
 
     def single(self):
@@ -155,6 +168,38 @@ class ElegantSolver:
         found = found1 or found2 or found3
         return found
 
+    def pointing_double(self):
+        board = self.board.raw_board
+        return False
+
+    def triple(self):
+        board = self.board.raw_board
+        return False
+
+    def hidden_triple(self):
+        board = self.board.raw_board
+        return False
+
+    def pointing_triple(self):
+        board = self.board.raw_board
+        return False
+
+    def quad(self):
+        board = self.board.raw_board
+        return False
+
+    def hidden_quad(self):
+        board = self.board.raw_board
+        return False
+
+    def x_wing(self):
+        board = self.board.raw_board
+        return False
+
+    def swordfish(self):
+        board = self.board.raw_board
+        return False
+
     def hidden_single_row(self):
         number_count = [(0, []) for value in range(0, 9)]
         board = self.board.cell_board
@@ -168,11 +213,7 @@ class ElegantSolver:
                     count += 1
                     location.append((i, j))
                     number_count[value - 1] = (count, location)
-            for value in range(1, 10):
-                if number_count[value - 1][0] is 1:
-                    (x, y) = number_count[value - 1][1][0]
-                    self.set_value(value, x, y)
-                    found = True
+            found = self.hidden_single_remove(number_count)
             number_count = [(0, []) for value in range(0, 9)]
         return found
 
@@ -189,11 +230,7 @@ class ElegantSolver:
                     count += 1
                     location.append((i, j))
                     number_count[value - 1] = (count, location)
-            for value in range(1, 10):
-                if number_count[value - 1][0] is 1:
-                    (x, y) = number_count[value - 1][1][0]
-                    self.set_value(value, x, y)
-                    found = True
+            found = self.hidden_single_remove(number_count)
             number_count = [(0, []) for value in range(0, 9)]
         return found
 
@@ -212,11 +249,7 @@ class ElegantSolver:
                             count += 1
                             location.append((i * 3 + k, j * 3 + l))
                             number_count[value - 1] = (count, location)
-                for value in range(1, 10):
-                    if number_count[value - 1][0] is 1:
-                        (x, y) = number_count[value - 1][1][0]
-                        self.set_value(value, x, y)
-                        found = True
+                found = self.hidden_single_remove(number_count)
                 number_count = [(0, []) for value in range(0, 9)]
         return found
 
@@ -260,14 +293,13 @@ class ElegantSolver:
         board = self.board.cell_board
         doubles = []
         removed = False
-
         # Find double in column
         for j in range(0, 9):
             for i in range(0, 9):
                 # Append any cell with only 2 possible values
                 if len(board[i][j].possibleValues) is 2:
                     doubles.append(board[i][j])
-            if len(doubles) > 1:
+
                 for k in range(0, len(doubles)):
                     if len(doubles[k].possibleValues) < 2:
                         break
@@ -348,32 +380,7 @@ class ElegantSolver:
                 count, location_list = number_count[value - 1]
                 if count is 2:
                     doubles.append((value, location_list))
-            if len(doubles) > 1:
-                for k in range(0, len(doubles)):
-                    value1, location_list_k = doubles[k]
-                    location_k1 = location_list_k[0]
-                    location_k2 = location_list_k[1]
-                    for l in range(k + 1, len(doubles)):
-                        value2, location_list_l = doubles[l]
-                        location_l1 = location_list_l[0]
-                        location_l2 = location_list_l[1]
-                        if (location_k1 == location_l1) and (location_k2 == location_l2):
-                            x1 = location_k1[0]
-                            x2 = location_k1[0]
-                            y1 = location_k1[1]
-                            y2 = location_k1[1]
-                            for value in range(1, value1):
-                                result1 = board[x1][y1].remove_possible_value(value)
-                                result2 = board[x2][y2].remove_possible_value(value)
-                                removed = removed or result1 or result2
-                            for value in range(value1 + 1, value2):
-                                result1 = board[x1][y1].remove_possible_value(value)
-                                result2 = board[x2][y2].remove_possible_value(value)
-                                removed = removed or result1 or result2
-                            for value in range(value2 + 1,10):
-                                result1 = board[x1][y1].remove_possible_value(value)
-                                result2 = board[x2][y2].remove_possible_value(value)
-                                removed = removed or result1 or result2
+            removed = self.hidden_double_remove(doubles)
             number_count = [(0, []) for value in range(0, 9)]
             doubles = []
         return removed
@@ -395,32 +402,7 @@ class ElegantSolver:
             for value in range(1, 10):
                 if number_count[value - 1][0] is 2:
                     doubles.append((value, number_count[value - 1][1]))
-            if len(doubles) > 1:
-                for k in range(0, len(doubles)):
-                    value1, location_list_k = doubles[k]
-                    location_k1 = location_list_k[0]
-                    location_k2 = location_list_k[1]
-                    for l in range(k + 1, len(doubles)):
-                        value2, location_list_l = doubles[l]
-                        location_l1 = location_list_l[0]
-                        location_l2 = location_list_l[1]
-                        if (location_k1 == location_l1) and (location_k2 == location_l2):
-                            x1 = location_k1[0]
-                            x2 = location_k1[0]
-                            y1 = location_k1[1]
-                            y2 = location_k1[1]
-                            for value in range(1, value1):
-                                result1 = board[x1][y1].remove_possible_value(value)
-                                result2 = board[x2][y2].remove_possible_value(value)
-                                removed = removed or result1 or result2
-                            for value in range(value1 + 1, value2):
-                                result1 = board[x1][y1].remove_possible_value(value)
-                                result2 = board[x2][y2].remove_possible_value(value)
-                                removed = removed or result1 or result2
-                            for value in range(value2 + 1,10):
-                                result1 = board[x1][y1].remove_possible_value(value)
-                                result2 = board[x2][y2].remove_possible_value(value)
-                                removed = removed or result1 or result2
+            removed = self.hidden_double_remove(doubles)
             number_count = [(0, []) for value in range(0, 9)]
             doubles = []
         return removed
@@ -444,34 +426,96 @@ class ElegantSolver:
                 for value in range(1, 10):
                     if number_count[value - 1][0] is 2:
                         doubles.append((value, number_count[value - 1][1]))
-                if len(doubles) > 1:
-                    for k in range(0, len(doubles)):
-                        value1, location_list_k = doubles[k]
-                        location_k1 = location_list_k[0]
-                        location_k2 = location_list_k[1]
-                        for l in range(k + 1, len(doubles)):
-                            value2, location_list_l = doubles[l]
-                            location_l1 = location_list_l[0]
-                            location_l2 = location_list_l[1]
-                            if (location_k1 == location_l1) and (location_k2 == location_l2):
-                                x1 = location_k1[0]
-                                x2 = location_k1[0]
-                                y1 = location_k1[1]
-                                y2 = location_k1[1]
-                                for value in range(1, value1):
-                                    result1 = board[x1][y1].remove_possible_value(value)
-                                    result2 = board[x2][y2].remove_possible_value(value)
-                                    removed = removed or result1 or result2
-                                for value in range(value1 + 1, value2):
-                                    result1 = board[x1][y1].remove_possible_value(value)
-                                    result2 = board[x2][y2].remove_possible_value(value)
-                                    removed = removed or result1 or result2
-                                for value in range(value2 + 1,10):
-                                    result1 = board[x1][y1].remove_possible_value(value)
-                                    result2 = board[x2][y2].remove_possible_value(value)
-                                    removed = removed or result1 or result2
+                removed = self.hidden_double_remove(doubles)
                 number_count = [(0, []) for value in range(0, 9)]
                 doubles = []
+        return removed
+
+    def pointing_double_row(self):
+        number_count = [(0, []) for value in range(0, 9)]
+        doubles = []
+        board = self.board.cell_board
+        removed = False
+
+        # Iterate over each box
+        for i in range(0, 3):
+            for j in range(0, 3):
+                for k in range(0, 3):
+                    for l in range(0, 3):
+                        for value in board[i * 3 + k][j * 3 + l].possibleValues:
+                            count, location = number_count[value - 1]
+                            count += 1
+                            location.append((i * 3 + k, j * 3 + l))
+                            number_count[value - 1] = (count, location)
+                for value in range(1, 10):
+                    if number_count[value - 1][0] is 2:
+                        doubles.append((value, number_count[value - 1][1]))
+                for data in doubles:
+                    count, location_list = data
+                    for k in range(0, len(location_list)):
+                        location_k = location_list[k]
+                        for l in range(k + 1, len(location_list)):
+                            location_l = location_list[l]
+                            if location_k[1] == location_l[1]:
+                                for m in range(0, j):
+                                    return removed
+        return removed
+
+    def pointing_double_column(self):
+        number_count = [(0, []) for value in range(0, 9)]
+        doubles = []
+        board = self.board.cell_board
+        removed = False
+
+        # Iterate over each box
+        for i in range(0, 3):
+            for j in range(0, 3):
+                for k in range(0, 3):
+                    for l in range(0, 3):
+                        removed = False
+        return removed
+
+    def hidden_single_remove(self, number_count):
+        found = False
+        for value in range(1, 10):
+                count, location = number_count[value - 1]
+                if count is 1:
+                    (x, y) = location[0]
+                    self.set_value(value, x, y)
+                    found = True
+
+        return found
+
+    def hidden_double_remove(self, doubles):
+        board = self.board.cell_board
+        removed = False
+
+        if len(doubles) > 1:
+            for k in range(0, len(doubles)):
+                value1, location_list_k = doubles[k]
+                location_k1 = location_list_k[0]
+                location_k2 = location_list_k[1]
+                for l in range(k + 1, len(doubles)):
+                    value2, location_list_l = doubles[l]
+                    location_l1 = location_list_l[0]
+                    location_l2 = location_list_l[1]
+                    if (location_k1 == location_l1) and (location_k2 == location_l2):
+                        x1 = location_k1[0]
+                        x2 = location_k1[0]
+                        y1 = location_k1[1]
+                        y2 = location_k1[1]
+                        for value in range(1, value1):
+                            result1 = board[x1][y1].remove_possible_value(value)
+                            result2 = board[x2][y2].remove_possible_value(value)
+                            removed = removed or result1 or result2
+                        for value in range(value1 + 1, value2):
+                            result1 = board[x1][y1].remove_possible_value(value)
+                            result2 = board[x2][y2].remove_possible_value(value)
+                            removed = removed or result1 or result2
+                        for value in range(value2 + 1, 10):
+                            result1 = board[x1][y1].remove_possible_value(value)
+                            result2 = board[x2][y2].remove_possible_value(value)
+                            removed = removed or result1 or result2
         return removed
 
 
