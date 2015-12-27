@@ -97,7 +97,7 @@ class ElegantSolver:
         self.board = Board(filePath)
 
     def setValue(self, value, i, j):
-        self.board._board[i][j].setValue(value)
+        self.board._board[i][j].set_value(value)
         self.board.board[i][j] = value
         self.board.removePV(i,j)
         
