@@ -145,6 +145,7 @@ class ElegantSolver:
                     found = True
                     self.set_value(board[i][j].possibleValues[0], i, j)
 
+        # If singles were found, return true.  Otherwise, return false
         return found
 
     def hidden_single(self):
@@ -215,6 +216,8 @@ class ElegantSolver:
                     number_count[value - 1] = (count, location)
             found = self.hidden_single_remove(number_count)
             number_count = [(0, []) for value in range(0, 9)]
+
+        # If singles were found, return true.  Otherwise, return false
         return found
 
     def hidden_single_column(self):
@@ -232,6 +235,8 @@ class ElegantSolver:
                     number_count[value - 1] = (count, location)
             found = self.hidden_single_remove(number_count)
             number_count = [(0, []) for value in range(0, 9)]
+
+        # If singles were found, return true.  Otherwise, return false
         return found
 
     def hidden_single_box(self):
@@ -251,115 +256,102 @@ class ElegantSolver:
                             number_count[value - 1] = (count, location)
                 found = self.hidden_single_remove(number_count)
                 number_count = [(0, []) for value in range(0, 9)]
+
+        # If singles were found, return true.  Otherwise, return false
         return found
 
     def double_row(self):
-        board = self.board.cell_board
-        doubles = []
         removed = False
 
-        # Find double in row
         for i in range(0, 9):
-            for j in range(0, 9):
-                # Append any cell with only 2 possible values
-                if len(board[i][j].possibleValues) is 2:
-                    doubles.append(board[i][j])
-            if len(doubles) > 1:
-                for k in range(0, len(doubles)):
-                    if len(doubles[k].possibleValues) < 2:
-                        break
-                    pv_k1 = doubles[k].possibleValues[0]
-                    pv_k2 = doubles[k].possibleValues[1]
-                    for l in range(k + 1, len(doubles)):
-                        if len(doubles[l].possibleValues) < 2:
-                            break
-                        pv_l1 = doubles[l].possibleValues[0]
-                        pv_l2 = doubles[l].possibleValues[1]
-                        if (pv_k1 == pv_l1) and (pv_k2 == pv_l2):
-                            value1 = pv_k1
-                            value2 = pv_k2
-                            for column in range(0, 9):
-                                result1 = board[i][column].remove_possible_value(value1)
-                                result2 = board[i][column].remove_possible_value(value2)
-                                removed = removed or result1 or result2
-                            doubles[k].add_possible_value(value1)
-                            doubles[k].add_possible_value(value2)
-                            doubles[l].add_possible_value(value1)
-                            doubles[l].add_possible_value(value2)
-            doubles = []
+            doubles = self.find_doubles(i, i + 1, 0, 9)
+            removed = self.process_doubles(doubles, i, i + 1, 0, 9)
+
+        # If any possible values were removed, return true.  Otherwise, return false
         return removed
 
     def double_column(self):
-        board = self.board.cell_board
-        doubles = []
         removed = False
-        # Find double in column
-        for j in range(0, 9):
-            for i in range(0, 9):
-                # Append any cell with only 2 possible values
-                if len(board[i][j].possibleValues) is 2:
-                    doubles.append(board[i][j])
 
-                for k in range(0, len(doubles)):
-                    if len(doubles[k].possibleValues) < 2:
-                        break
-                    pv_k1 = doubles[k].possibleValues[0]
-                    pv_k2 = doubles[k].possibleValues[1]
-                    for l in range(k + 1, len(doubles)):
-                        if len(doubles[l].possibleValues) < 2:
-                            break
-                        pv_l1 = doubles[l].possibleValues[0]
-                        pv_l2 = doubles[l].possibleValues[1]
-                        if (pv_k1 == pv_l1) and (pv_k2 == pv_l2):
-                            value1 = pv_k1
-                            value2 = pv_k2
-                            for row in range(0, 9):
-                                result1 = board[row][j].remove_possible_value(value1)
-                                result2 = board[row][j].remove_possible_value(value2)
-                                removed = removed or result1 or result2
-                            doubles[k].add_possible_value(value1)
-                            doubles[k].add_possible_value(value2)
-                            doubles[l].add_possible_value(value1)
-                            doubles[l].add_possible_value(value2)
-            doubles = []
+        for j in range(0, 9):
+            doubles = self.find_doubles(0, 9, j, j + 1)
+            removed = self.process_doubles(doubles, 0, 9, j, j + 1)
+
+        # If any possible values were removed, return true.  Otherwise, return false
         return removed
 
     def double_box(self):
-        board = self.board.cell_board
-        doubles = []
         removed = False
 
         # Find double in 3x3 box
         for i in range(0, 3):
             for j in range(0, 3):
-                for k in range(0, 3):
-                    for l in range(0, 3):
-                        if len(board[i * 3 + k][j * 3 + l].possibleValues) is 2:
-                            doubles.append(board[i * 3 + k][j * 3 + l])
-                if len(doubles) > 1:
-                    for k in range(0, len(doubles)):
-                        if len(doubles[k].possibleValues) < 2:
-                            break
-                        pv_k1 = doubles[k].possibleValues[0]
-                        pv_k2 = doubles[k].possibleValues[1]
-                        for l in range(k + 1, len(doubles)):
-                            if len(doubles[l].possibleValues) < 2:
-                                break
-                            pv_l1 = doubles[l].possibleValues[0]
-                            pv_l2 = doubles[l].possibleValues[1]
-                            if (pv_k1 == pv_l1) and (pv_k2 == pv_l2):
-                                value1 = pv_k1
-                                value2 = pv_k2
-                                for row in range(0, 3):
-                                    for column in range(0, 3):
-                                        result1 = board[i * 3 + row][j * 3 + column].remove_possible_value(value1)
-                                        result2 = board[i * 3 + row][j * 3 + column].remove_possible_value(value2)
-                                        removed = removed or result1 or result2
-                                doubles[k].add_possible_value(value1)
-                                doubles[k].add_possible_value(value2)
-                                doubles[l].add_possible_value(value1)
-                                doubles[l].add_possible_value(value2)
-                doubles = []
+                doubles = self.find_doubles(i * 3, (i + 1) * 3, j * 3, (j + 1) * 3)
+                removed = self.process_doubles(doubles, i * 3, (i + 1) * 3, j * 3, (j + 1) * 3)
+
+        # If any possible values were removed, return true.  Otherwise, return false
+        return removed
+
+    def find_doubles(self, row_min, row_max, column_min, column_max):
+        # Syntactic sugar to make it easier to read
+        board = self.board.cell_board
+
+        # List of cells that have only two possible values
+        doubles = []
+
+        # Find any cell with only two possible numbers
+        for row in range(row_min, row_max):
+            for column in range(column_min, column_max):
+                if len(board[row][column].possibleValues) is 2:
+                    doubles.append(board[row][column])
+
+        # Return array of found doubles
+        return doubles
+
+    def process_doubles(self, doubles, row_min, row_max, column_min, column_max):
+        # Syntactic sugar to make it easier to read
+        board = self.board.cell_board
+
+        # Represents if any possible values were removed.
+        removed = False
+
+        # To remove possible values, there needs to be a pair of doubles, not just a single cell with only two values
+        if len(doubles) > 1:
+            for i in range(0, len(doubles)):
+                # As values may be removed during a loop, only do something if there are at least 2 possible values
+                if len(doubles[i].possibleValues) < 2:
+                    break
+
+                # Syntactic sugar to bring out possible values for cell i
+                possible_value_i_1 = doubles[i].possibleValues[0]
+                possible_value_i_2 = doubles[i].possibleValues[1]
+
+                for j in range(i + 1, len(doubles)):
+                    # As values may be removed during a loop, only do something if there are at least 2 possible values
+                    if len(doubles[j].possibleValues) < 2:
+                        break
+
+                    # Syntactic sugar to bring out possible values for cell j
+                    possible_value_j_1 = doubles[j].possibleValues[0]
+                    possible_value_j_2 = doubles[j].possibleValues[1]
+
+                    # If the two possible values for two cells match, remove the possible values for all other cells
+                    if (possible_value_i_1 == possible_value_j_1) and (possible_value_i_2 == possible_value_j_2):
+                        value1 = possible_value_i_1
+                        value2 = possible_value_i_2
+                        for row in range(row_min, row_max):
+                            for column in range(column_min, column_max):
+                                result1 = board[row][column].remove_possible_value(value1)
+                                result2 = board[row][column].remove_possible_value(value2)
+                                removed = removed or result1 or result2
+
+                        # Since thep possible values were removed for the two cells, put them back in
+                        doubles[i].add_possible_value(value1)
+                        doubles[i].add_possible_value(value2)
+                        doubles[j].add_possible_value(value1)
+                        doubles[j].add_possible_value(value2)
+
+        # If any possible values were removed, return true.  Otherwise, return false
         return removed
 
     def hidden_double_row(self):
