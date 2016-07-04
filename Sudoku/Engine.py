@@ -202,60 +202,35 @@ class ElegantSolver:
         return False
 
     def hidden_single_row(self):
-        number_count = [(0, []) for value in range(0, 9)]
-        board = self.board.cell_board
         found = False
 
         # Find single in row
         for i in range(0, 9):
-            for j in range(0, 9):
-                for value in board[i][j].possibleValues:
-                    count, location = number_count[value - 1]
-                    count += 1
-                    location.append((i, j))
-                    number_count[value - 1] = (count, location)
+            number_count = self.get_number_count(i, i + 1, 0, 9)
             found = self.hidden_single_remove(number_count)
-            number_count = [(0, []) for value in range(0, 9)]
 
         # If singles were found, return true.  Otherwise, return false
         return found
 
     def hidden_single_column(self):
-        number_count = [(0, []) for value in range(0, 9)]
-        board = self.board.cell_board
         found = False
 
         # Find single in column
         for j in range(0, 9):
-            for i in range(0, 9):
-                for value in board[i][j].possibleValues:
-                    count, location = number_count[value - 1]
-                    count += 1
-                    location.append((i, j))
-                    number_count[value - 1] = (count, location)
+            number_count = self.get_number_count(0, 9, j, j + 1)
             found = self.hidden_single_remove(number_count)
-            number_count = [(0, []) for value in range(0, 9)]
 
         # If singles were found, return true.  Otherwise, return false
         return found
 
     def hidden_single_box(self):
-        number_count = [(0, []) for value in range(0, 9)]
-        board = self.board.cell_board
         found = False
 
         # Find single in box
         for i in range(0, 3):
             for j in range(0, 3):
-                for k in range(0, 3):
-                    for l in range(0, 3):
-                        for value in board[i * 3 + k][j * 3 + l].possibleValues:
-                            count, location = number_count[value - 1]
-                            count += 1
-                            location.append((i * 3 + k, j * 3 + l))
-                            number_count[value - 1] = (count, location)
+                number_count = self.get_number_count(i * 3, (i + 1) * 3, j * 3, (j + 1) * 3)
                 found = self.hidden_single_remove(number_count)
-                number_count = [(0, []) for value in range(0, 9)]
 
         # If singles were found, return true.  Otherwise, return false
         return found
@@ -355,72 +330,37 @@ class ElegantSolver:
         return removed
 
     def hidden_double_row(self):
-        number_count = [(0, []) for value in range(0, 9)]
-        doubles = []
-        board = self.board.cell_board
         removed = False
 
         # Find double in row
         for i in range(0, 9):
-            for j in range(0, 9):
-                for value in board[i][j].possibleValues:
-                    count, location_list = number_count[value - 1]
-                    count += 1
-                    location_list.append((i, j))
-                    number_count[value - 1] = (count, location_list)
-            for value in range(1, 10):
-                count, location_list = number_count[value - 1]
-                if count is 2:
-                    doubles.append((value, location_list))
+            number_count = self.get_number_count(i, i + 1, 0, 9)
+            doubles = self.hidden_double_get_list(number_count)
             removed = self.hidden_double_remove(doubles)
-            number_count = [(0, []) for value in range(0, 9)]
-            doubles = []
+
         return removed
 
     def hidden_double_column(self):
-        number_count = [(0, []) for value in range(0, 9)]
-        doubles = []
-        board = self.board.cell_board
         removed = False
 
         # Find double in column
         for j in range(0, 9):
-            for i in range(0, 9):
-                for value in board[i][j].possibleValues:
-                    count, location = number_count[value - 1]
-                    count += 1
-                    location.append((i, j))
-                    number_count[value - 1] = (count, location)
-            for value in range(1, 10):
-                if number_count[value - 1][0] is 2:
-                    doubles.append((value, number_count[value - 1][1]))
+            number_count = self.get_number_count(0, 9, j, j + 1)
+            doubles = self.hidden_double_get_list(number_count)
             removed = self.hidden_double_remove(doubles)
-            number_count = [(0, []) for value in range(0, 9)]
-            doubles = []
+
         return removed
 
     def hidden_double_box(self):
-        number_count = [(0, []) for value in range(0, 9)]
-        doubles = []
-        board = self.board.cell_board
         removed = False
 
         # Find double in box
         for i in range(0, 3):
             for j in range(0, 3):
-                for k in range(0, 3):
-                    for l in range(0, 3):
-                        for value in board[i * 3 + k][j * 3 + l].possibleValues:
-                            count, location = number_count[value - 1]
-                            count += 1
-                            location.append((i * 3 + k, j * 3 + l))
-                            number_count[value - 1] = (count, location)
-                for value in range(1, 10):
-                    if number_count[value - 1][0] is 2:
-                        doubles.append((value, number_count[value - 1][1]))
+                number_count = self.get_number_count(i * 3, (i + 1) * 3, j * 3, (j + 1) * 3)
+                doubles = self.hidden_double_get_list(number_count)
                 removed = self.hidden_double_remove(doubles)
-                number_count = [(0, []) for value in range(0, 9)]
-                doubles = []
+
         return removed
 
     def pointing_double_row(self):
@@ -477,6 +417,31 @@ class ElegantSolver:
                     found = True
 
         return found
+
+    def get_number_count(self, row_min, row_max, column_min, column_max):
+        # Syntactic sugar to make it easier to read
+        board = self.board.cell_board
+
+        # Setup number count to get count of each value
+        number_count = [(0, []) for value in range(0, 9)]
+
+        for row in range(row_min, row_max):
+            for column in range(column_min, column_max):
+                for value in board[row][column].possibleValues:
+                    count, location = number_count[value - 1]
+                    count += 1
+                    location.append((row, column))
+                    number_count[value - 1] = (count, location)
+
+        return number_count
+
+    def hidden_double_get_list(self, number_count):
+        doubles = []
+        for value in range(1, 10):
+            count, location_list = number_count[value - 1]
+            if count is 2:
+                doubles.append((value, location_list))
+        return doubles
 
     def hidden_double_remove(self, doubles):
         board = self.board.cell_board
