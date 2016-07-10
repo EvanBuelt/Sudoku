@@ -1,6 +1,7 @@
 import unittest
-import Sudoku.IO as IO
-import Sudoku.Solve as Solve
+
+import Sudoku.Solver.IO as IO
+import Sudoku.Solver.Solve as Solve
 import SudokuGame
 
 
